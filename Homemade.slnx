@@ -1,1 +1,4 @@
-<Solution />
+<Solution>
+  <Project Path="src\Homemade.AppHost\Homemade.AppHost.csproj" />
+  <Project Path="src\Homemade.ServiceDefaults\Homemade.ServiceDefaults.csproj" />
+</Solution>
