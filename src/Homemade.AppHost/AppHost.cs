@@ -1,5 +1,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddDockerComposeEnvironment("compose");
+var database = builder.AddPostgres("database");
+var recipesDb = database.AddDatabase("recipes");
+var usersDb = database.AddDatabase("users");
 
+builder.AddDockerComposeEnvironment("compose");
 builder.Build().Run();
