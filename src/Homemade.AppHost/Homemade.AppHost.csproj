@@ -12,4 +12,8 @@
         <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.5.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Homemade.Migrations.Worker\Homemade.Migrations.Worker.csproj" />
+    </ItemGroup>
+
 </Project>
