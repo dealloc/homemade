@@ -3,6 +3,10 @@ using Homemade.Web.Components;
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
+#if DEBUG
+builder.Services.AddTailwindWatcher();
+#endif
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()

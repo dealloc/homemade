@@ -10,7 +10,12 @@
     <ItemGroup>
         <ProjectReference Include="..\Homemade.ServiceDefaults\Homemade.ServiceDefaults.csproj" />
         <ProjectReference Include="..\Homemade.Web.Client\Homemade.Web.Client.csproj"/>
+        <PackageReference Include="Elixus.Tailwind" Version="1.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.10"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <TailwindInput Include="Styles/app.css" />
     </ItemGroup>
 
 </Project>
