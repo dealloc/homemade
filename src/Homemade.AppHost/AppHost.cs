@@ -18,5 +18,7 @@ builder.AddProject<Homemade_Migrations_Worker>("migrations")
     .WaitFor(recipesDb)
     .WaitFor(usersDb);
 
+builder.AddProject<Homemade_Web>("web-interface");
+
 builder.AddDockerComposeEnvironment("compose");
 builder.Build().Run();

@@ -6,4 +6,8 @@
   <Folder Name="/Services/">
     <Project Path="src\Homemade.Migrations.Worker\Homemade.Migrations.Worker.csproj" />
   </Folder>
+  <Folder Name="/Web/">
+    <Project Path="src\Homemade.Web.Client\Homemade.Web.Client.csproj" />
+    <Project Path="src\Homemade.Web\Homemade.Web.csproj" />
+  </Folder>
 </Solution>

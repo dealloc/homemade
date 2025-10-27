@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Homemade.Migrations.Worker\Homemade.Migrations.Worker.csproj" />
+      <ProjectReference Include="..\Homemade.Web\Homemade.Web.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>a2764be2-c411-43c6-b75c-e4f843449142</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Homemade.ServiceDefaults\Homemade.ServiceDefaults.csproj" />
+        <ProjectReference Include="..\Homemade.Web.Client\Homemade.Web.Client.csproj"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.10"/>
+    </ItemGroup>
+
+</Project>
