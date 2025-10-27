@@ -12,6 +12,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddHybridCache();
+builder.Services.AddStackExchangeRedisCache(options =>
+    options.Configuration = builder.Configuration.GetConnectionString("redis")
+);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
