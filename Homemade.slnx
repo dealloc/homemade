@@ -1,7 +1,9 @@
 <Solution>
-    <Folder Name="/Aspire/">
-        <Project Path="src\Homemade.AppHost\Homemade.AppHost.csproj"/>
-        <Project Path="src\Homemade.ServiceDefaults\Homemade.ServiceDefaults.csproj"/>
-    </Folder>
-    <Project Path="src\Homemade.Migrations.Worker\Homemade.Migrations.Worker.csproj"/>
+  <Folder Name="/Aspire/">
+    <Project Path="src\Homemade.AppHost\Homemade.AppHost.csproj" />
+    <Project Path="src\Homemade.ServiceDefaults\Homemade.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="src\Homemade.Migrations.Worker\Homemade.Migrations.Worker.csproj" />
+  </Folder>
 </Solution>
