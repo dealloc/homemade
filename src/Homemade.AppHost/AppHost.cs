@@ -10,13 +10,10 @@ redis.WithDbGate(configure => configure.WithParentRelationship(redis));
 
 var database = builder.AddPostgres("database");
 var recipesDb = database.AddDatabase("recipes");
-var usersDb = database.AddDatabase("users");
 
 builder.AddProject<Homemade_Migrations_Worker>("migrations")
     .WithReference(recipesDb)
-    .WithReference(usersDb)
-    .WaitFor(recipesDb)
-    .WaitFor(usersDb);
+    .WaitFor(recipesDb);
 
 builder.AddProject<Homemade_Web>("web-interface")
     .WithReference(redis);
