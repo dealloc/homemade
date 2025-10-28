@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Homemade.MCP\Homemade.MCP.csproj" />
       <ProjectReference Include="..\Homemade.Migrations.Worker\Homemade.Migrations.Worker.csproj" />
       <ProjectReference Include="..\Homemade.Web\Homemade.Web.csproj" />
     </ItemGroup>

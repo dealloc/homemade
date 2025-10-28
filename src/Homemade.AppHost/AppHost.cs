@@ -15,6 +15,8 @@ builder.AddProject<Homemade_Migrations_Worker>("migrations")
     .WithReference(recipesDb)
     .WaitFor(recipesDb);
 
+builder.AddProject<Homemade_MCP>("mcp");
+
 builder.AddProject<Homemade_Web>("web-interface")
     .WithReference(redis);
 
