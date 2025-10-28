@@ -4,6 +4,7 @@
     <Project Path="src\Homemade.ServiceDefaults\Homemade.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/Services/">
+    <Project Path="src\Homemade.AI\Homemade.AI.csproj" Type="Classic C#" />
     <Project Path="src\Homemade.MCP\Homemade.MCP.csproj" Type="Classic C#" />
     <Project Path="src\Homemade.Migrations.Worker\Homemade.Migrations.Worker.csproj" />
   </Folder>
