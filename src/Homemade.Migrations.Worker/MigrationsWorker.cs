@@ -24,18 +24,7 @@ public sealed class MigrationsWorker<TContext>(
 
         // ReSharper disable once ExplicitCallerInfoArgument
         using var activity = Source.StartActivity($"{name}.{nameof(ExecuteAsync)}");
-        await CreateDatabase(context, cancellationToken);
         await RunMigrationAsync(context, cancellationToken);
-    }
-
-    /// <summary>
-    /// Creates the database if it doesn't exist and creates the EF migration tables if they don't exist.
-    /// </summary>
-    private static async Task CreateDatabase(TContext context, CancellationToken cancellationToken)
-    {
-        using var activity = Source.StartActivity();
-
-        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 
     /// <summary>
