@@ -486,3 +486,4 @@ $RECYCLE.BIN/
 # Generated files
 src/Homemade.Web/wwwroot/*.css
 .tailwind/
+aspire-output/

@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <Sdk Name="Aspire.AppHost.Sdk" Version="9.5.1" />
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.5.2" />
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <UserSecretsId>88eeacec-5b10-47bb-9611-c503d5e09007</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.1" />
-        <PackageReference Include="Aspire.Hosting.Docker" Version="9.5.1-preview.1.25502.11" />
-        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.5.1" />
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.2" />
+        <PackageReference Include="Aspire.Hosting.Docker" Version="9.5.2-preview.1.25522.3" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.5.2" />
         <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.5.2" />
         <PackageReference Include="CommunityToolkit.Aspire.Hosting.Ollama" Version="9.8.0" />
         <PackageReference Include="CommunityToolkit.Aspire.Hosting.Redis.Extensions" Version="9.8.0" />

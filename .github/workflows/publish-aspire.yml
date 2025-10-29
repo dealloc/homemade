@@ -1,0 +1,125 @@
+name: Publish Aspire Application
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install Aspire CLI
+        run: dotnet tool install -g Aspire.Cli --prerelease
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Publish Aspire AppHost
+        run: aspire publish --output aspire-output
+
+      - name: Tag and push Docker images to GHCR
+        run: |
+          # Define the services to publish
+          services=("migrations" "mcp" "ai" "web-interface")
+
+          # Extract version from tag (e.g., refs/tags/v1.0.0 -> v1.0.0)
+          VERSION=${GITHUB_REF#refs/tags/}
+
+          for service in "${services[@]}"; do
+            echo "Processing $service..."
+
+            # Tag with version, latest, and git SHA
+            docker tag ${service}:latest ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}:latest
+            docker tag ${service}:latest ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}:${VERSION}
+            docker tag ${service}:latest ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}:${{ github.sha }}
+
+            # Push all tags
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}:${VERSION}
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${service}:${{ github.sha }}
+          done
+
+      - name: Update docker-compose.yaml with GHCR image references
+        run: |
+          cd aspire-output
+
+          # Update .env file with GHCR image references
+          sed -i "s|MIGRATIONS_IMAGE=migrations:latest|MIGRATIONS_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/migrations:latest|g" .env
+          sed -i "s|MCP_IMAGE=mcp:latest|MCP_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/mcp:latest|g" .env
+          sed -i "s|AI_IMAGE=ai:latest|AI_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/ai:latest|g" .env
+          sed -i "s|WEB_INTERFACE_IMAGE=web-interface:latest|WEB_INTERFACE_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/web-interface:latest|g" .env
+
+          echo "Updated .env file:"
+          cat .env
+
+      - name: Create deployment overview
+        run: |
+          # Extract version from tag
+          VERSION=${GITHUB_REF#refs/tags/}
+
+          # Create release body file
+          cat > release-body.md << EOF
+          ## Aspire Application Published Successfully :rocket:
+
+          ### Published Docker Images
+
+          The following images have been published to GitHub Container Registry:
+
+          - \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/migrations:${VERSION}\`
+          - \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/mcp:${VERSION}\`
+          - \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/ai:${VERSION}\`
+          - \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/web-interface:${VERSION}\`
+
+          All images are also tagged with \`latest\` and \`${{ github.sha }}\`.
+
+          ### Docker Compose Files
+
+          The docker-compose.yaml and .env files have been attached to this release as \`aspire-compose.zip\`.
+
+          **Commit SHA:** \`${{ github.sha }}\`
+          EOF
+
+          # Also output to step summary
+          cat release-body.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Create release archive
+        run: |
+          cd aspire-output
+          zip -r ../aspire-compose.zip .
+          cd ..
+
+      - name: Upload artifacts to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload ${{ github.ref_name }} aspire-compose.zip --clobber
+
+      - name: Update release body
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit ${{ github.ref_name }} --notes-file release-body.md
