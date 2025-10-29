@@ -1,7 +1,7 @@
-@page "/login"
+@page "/Account/Register"
 @rendermode InteractiveServer
 
-<PageTitle>Login - Homemade</PageTitle>
+<PageTitle>Create Account - Homemade</PageTitle>
 
 <div class="min-h-screen bg-gradient-to-b from-primary-50 to-white flex items-center justify-center px-4 py-12">
     <div class="w-full max-w-md">
@@ -10,31 +10,44 @@
             <span class="mr-2">←</span> Back to home
         </a>
 
-        <!-- Login Card -->
+        <!-- Register Card -->
         <div class="bg-white rounded-2xl shadow-lg p-8">
             <!-- Logo/Header -->
             <div class="text-center mb-8">
                 <div class="text-5xl mb-3">🍽️</div>
-                <h1 class="text-3xl font-bold text-neutral-900 mb-2">Welcome Back</h1>
-                <p class="text-neutral-600">Log in to access your recipes</p>
+                <h1 class="text-3xl font-bold text-neutral-900 mb-2">Create Account</h1>
+                <p class="text-neutral-600">Start organizing your recipes today</p>
             </div>
-
-            @if (showError)
-            {
-                <div class="mb-6 p-4 bg-error-50 border-l-4 border-error-500 rounded">
-                    <p class="text-error-700 text-sm">Invalid email or password. Please try again.</p>
-                </div>
-            }
 
             @if (showSuccess)
             {
                 <div class="mb-6 p-4 bg-success-50 border-l-4 border-success-500 rounded">
-                    <p class="text-success-700 text-sm">✓ Login successful! Redirecting...</p>
+                    <p class="text-success-700 text-sm font-semibold mb-1">✓ Account created successfully!</p>
+                    <p class="text-success-700 text-sm">Redirecting to your dashboard...</p>
                 </div>
             }
 
-            <!-- Login Form -->
-            <form @onsubmit="HandleLogin" @onsubmit:preventDefault>
+            <!-- Register Form -->
+            <form @onsubmit="HandleRegister" @onsubmit:preventDefault>
+                <!-- Full Name Field -->
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-neutral-700 mb-2">
+                        Full Name
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="John Doe"
+                        class="w-full px-4 py-3 border-2 rounded-xl transition-colors @(nameError ? "border-error-300 focus:border-error-500" : "border-neutral-200 focus:border-primary-500") focus:outline-none"
+                        @bind="fullName"
+                        @oninput="() => nameError = false"
+                        required
+                    />
+                    @if (nameError)
+                    {
+                        <p class="mt-1 text-sm text-error-700">Please enter your full name</p>
+                    }
+                </div>
+
                 <!-- Email Field -->
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-neutral-700 mb-2">
@@ -50,7 +63,7 @@
                     />
                     @if (emailError)
                     {
-                        <p class="mt-1 text-sm text-error-700">Please enter a valid email address</p>
+                        <p class="mt-1 text-sm text-error-700">@emailErrorMessage</p>
                     }
                 </div>
 
@@ -62,7 +75,7 @@
                     <div class="relative">
                         <input
                             type="@(showPassword ? "text" : "password")"
-                            placeholder="Enter your password"
+                            placeholder="Create a strong password"
                             class="w-full px-4 py-3 pr-12 border-2 rounded-xl transition-colors @(passwordError ? "border-error-300 focus:border-error-500" : "border-neutral-200 focus:border-primary-500") focus:outline-none"
                             @bind="password"
                             @oninput="() => passwordError = false"
@@ -77,37 +90,71 @@
                     </div>
                     @if (passwordError)
                     {
-                        <p class="mt-1 text-sm text-error-700">Password is required</p>
+                        <p class="mt-1 text-sm text-error-700">@passwordErrorMessage</p>
+                    }
+                    else
+                    {
+                        <p class="mt-1 text-xs text-neutral-500">At least 8 characters with uppercase, lowercase, and numbers</p>
                     }
                 </div>
 
-                <!-- Remember Me & Forgot Password -->
-                <div class="flex items-center justify-between mb-6">
-                    <label class="flex items-center cursor-pointer">
-                        <input
-                            type="checkbox"
-                            class="mr-2 w-4 h-4 text-primary-500 border-neutral-300 rounded focus:ring-primary-500"
-                            @bind="rememberMe"
-                        />
-                        <span class="text-sm text-neutral-700">Remember me</span>
+                <!-- Confirm Password Field -->
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-neutral-700 mb-2">
+                        Confirm Password
                     </label>
-                    <a href="/forgot-password" class="text-sm text-primary-600 hover:text-primary-700 transition-colors">
-                        Forgot password?
-                    </a>
+                    <div class="relative">
+                        <input
+                            type="@(showConfirmPassword ? "text" : "password")"
+                            placeholder="Confirm your password"
+                            class="w-full px-4 py-3 pr-12 border-2 rounded-xl transition-colors @(confirmPasswordError ? "border-error-300 focus:border-error-500" : "border-neutral-200 focus:border-primary-500") focus:outline-none"
+                            @bind="confirmPassword"
+                            @oninput="() => confirmPasswordError = false"
+                            required
+                        />
+                        <button
+                            type="button"
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                            @onclick="ToggleConfirmPasswordVisibility">
+                            @(showConfirmPassword ? "👁️" : "👁️‍🗨️")
+                        </button>
+                    </div>
+                    @if (confirmPasswordError)
+                    {
+                        <p class="mt-1 text-sm text-error-700">Passwords do not match</p>
+                    }
                 </div>
 
-                <!-- Login Button -->
+                <!-- Terms of Service -->
+                <div class="mb-6">
+                    <label class="flex items-start cursor-pointer">
+                        <input
+                            type="checkbox"
+                            class="mt-1 mr-3 w-4 h-4 text-primary-500 border-neutral-300 rounded focus:ring-primary-500"
+                            @bind="acceptTerms"
+                        />
+                        <span class="text-sm text-neutral-700">
+                            I agree to the <a href="/terms" class="text-primary-600 hover:text-primary-700">Terms of Service</a> and <a href="/privacy" class="text-primary-600 hover:text-primary-700">Privacy Policy</a>
+                        </span>
+                    </label>
+                    @if (termsError)
+                    {
+                        <p class="mt-1 text-sm text-error-700">You must accept the terms to continue</p>
+                    }
+                </div>
+
+                <!-- Register Button -->
                 <button
                     type="submit"
                     class="w-full py-3 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed mb-6"
                     disabled="@isLoading">
                     @if (isLoading)
                     {
-                        <span>Logging in...</span>
+                        <span>Creating account...</span>
                     }
                     else
                     {
-                        <span>Log In</span>
+                        <span>Create Account</span>
                     }
                 </button>
 
@@ -117,11 +164,11 @@
                         <div class="w-full border-t border-neutral-200"></div>
                     </div>
                     <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-white text-neutral-500">Or continue with</span>
+                        <span class="px-4 bg-white text-neutral-500">Or sign up with</span>
                     </div>
                 </div>
 
-                <!-- Social Login Buttons (Visual Only) -->
+                <!-- Social Signup Buttons (Visual Only) -->
                 <div class="grid grid-cols-2 gap-3 mb-6">
                     <button
                         type="button"
@@ -146,11 +193,11 @@
                     </button>
                 </div>
 
-                <!-- Register Link -->
+                <!-- Login Link -->
                 <div class="text-center">
-                    <span class="text-neutral-600">Don't have an account? </span>
-                    <a href="/register" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
-                        Sign up
+                    <span class="text-neutral-600">Already have an account? </span>
+                    <a href="/login" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
+                        Log in
                     </a>
                 </div>
             </form>
@@ -159,65 +206,113 @@
 </div>
 
 @code {
+    private string fullName = "";
     private string email = "";
     private string password = "";
-    private bool rememberMe = false;
+    private string confirmPassword = "";
+    private bool acceptTerms = false;
     private bool showPassword = false;
+    private bool showConfirmPassword = false;
     private bool isLoading = false;
-    private bool showError = false;
     private bool showSuccess = false;
+
+    private bool nameError = false;
     private bool emailError = false;
+    private string emailErrorMessage = "";
     private bool passwordError = false;
+    private string passwordErrorMessage = "";
+    private bool confirmPasswordError = false;
+    private bool termsError = false;
 
     private void TogglePasswordVisibility()
     {
         showPassword = !showPassword;
     }
 
-    private async Task HandleLogin()
+    private void ToggleConfirmPasswordVisibility()
+    {
+        showConfirmPassword = !showConfirmPassword;
+    }
+
+    private async Task HandleRegister()
     {
         // Reset errors
+        nameError = false;
         emailError = false;
         passwordError = false;
-        showError = false;
+        confirmPasswordError = false;
+        termsError = false;
         showSuccess = false;
 
-        // Basic validation
+        bool hasErrors = false;
+
+        // Validate full name
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            nameError = true;
+            hasErrors = true;
+        }
+
+        // Validate email
         if (string.IsNullOrWhiteSpace(email))
         {
             emailError = true;
-            return;
+            emailErrorMessage = "Email is required";
+            hasErrors = true;
+        }
+        else if (!email.Contains("@"))
+        {
+            emailError = true;
+            emailErrorMessage = "Please enter a valid email address";
+            hasErrors = true;
         }
 
+        // Validate password
         if (string.IsNullOrWhiteSpace(password))
         {
             passwordError = true;
-            return;
+            passwordErrorMessage = "Password is required";
+            hasErrors = true;
+        }
+        else if (password.Length < 8)
+        {
+            passwordError = true;
+            passwordErrorMessage = "Password must be at least 8 characters";
+            hasErrors = true;
         }
 
-        // Mock login process
+        // Validate confirm password
+        if (password != confirmPassword)
+        {
+            confirmPasswordError = true;
+            hasErrors = true;
+        }
+
+        // Validate terms
+        if (!acceptTerms)
+        {
+            termsError = true;
+            hasErrors = true;
+        }
+
+        if (hasErrors) return;
+
+        // Mock registration process
         isLoading = true;
-        await Task.Delay(1500); // Simulate API call
+        await Task.Delay(2000); // Simulate API call
         isLoading = false;
 
-        // TODO: Replace with actual authentication logic
-        // For now, show success for demo@example.com / password
-        if (email == "demo@example.com" && password == "password")
-        {
-            showSuccess = true;
-            await Task.Delay(1000);
-            // TODO: Navigate to home or dashboard
-            // NavigationManager.NavigateTo("/");
-        }
-        else
-        {
-            showError = true;
-        }
+        // TODO: Replace with actual registration logic
+        // For now, always succeed
+        showSuccess = true;
+        await Task.Delay(2000);
+        // TODO: Navigate to home or dashboard
+        // NavigationManager.NavigateTo("/");
     }
 
     private void ShowComingSoonMessage()
     {
         // TODO: Show toast/notification
-        Console.WriteLine("Social login coming soon!");
+        Console.WriteLine("Social signup coming soon!");
     }
 }

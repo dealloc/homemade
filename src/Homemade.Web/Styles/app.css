@@ -2,6 +2,10 @@
 
 @source "../../Homemade.Web.Client/Components";
 
+@utility animate-delay-* {
+    animation-delay: --value([*]);
+}
+
 @theme {
     /* Primary - Warm Orange (for food/cooking) */
     --color-primary-50: oklch(0.97 0.01 50);

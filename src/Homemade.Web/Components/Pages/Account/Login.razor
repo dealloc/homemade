@@ -1,0 +1,244 @@
+@page "/Account/Login"
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@using Homemade.Database.Entities
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Google
+@using Microsoft.AspNetCore.Identity
+@inject NavigationManager NavigationManager
+@inject SignInManager<User> SignInManager
+
+<PageTitle>Login - Homemade</PageTitle>
+
+<div class="min-h-screen bg-gradient-to-b from-primary-50 to-white flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+        <!-- Back to Home -->
+        <a href="/" class="inline-flex items-center text-neutral-600 hover:text-primary-600 mb-6 transition-colors">
+            <span class="mr-2">←</span> Back to home
+        </a>
+
+        <!-- Login Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <!-- Logo/Header -->
+            <div class="text-center mb-8">
+                <div class="text-5xl mb-3">🍽️</div>
+                <h1 class="text-3xl font-bold text-neutral-900 mb-2">Welcome Back</h1>
+                <p class="text-neutral-600">Log in to access your recipes</p>
+            </div>
+
+            @if (string.IsNullOrWhiteSpace(ErrorMessage) is false)
+            {
+                <div class="mb-6 p-4 bg-error-50 border-l-4 border-error-500 rounded">
+                    <p class="text-error-700 text-sm">@ErrorMessage</p>
+                </div>
+            }
+
+            @if (string.IsNullOrWhiteSpace(SuccessMessage) is false)
+            {
+                <div class="mb-6 p-4 bg-success-50 border-l-4 border-success-500 rounded">
+                    <p class="text-success-700 text-sm">@SuccessMessage</p>
+                </div>
+            }
+
+            <!-- Login Form -->
+            <EditForm Model="@Model" OnValidSubmit="HandleLogin" FormName="LoginForm">
+                <DataAnnotationsValidator/>
+                <!-- Email Field -->
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-neutral-700 mb-2">
+                        Email
+                    </label>
+                    <InputText
+                        @bind-Value="Model.Email"
+                        type="email"
+                        placeholder="your@email.com"
+                        class="w-full px-4 py-3 border-2 rounded-xl transition-colors border-neutral-200 focus:border-primary-500 focus:outline-none"
+                    />
+                    <ValidationMessage For="@(() => Model.Email)" class="mt-1 text-sm text-error-700"/>
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-neutral-700 mb-2">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <InputText
+                            @bind-Value="Model.Password"
+                            type="@(ShowPassword ? "text" : "password")"
+                            placeholder="Enter your password"
+                            class="w-full px-4 py-3 pr-12 border-2 rounded-xl transition-colors border-neutral-200 focus:border-primary-500 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                            @onclick="TogglePasswordVisibility">
+                            @(ShowPassword ? "👁️" : "👁️‍🗨️")
+                        </button>
+                    </div>
+                    <ValidationMessage For="@(() => Model.Password)" class="mt-1 text-sm text-error-700"/>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between mb-6">
+                    <label class="flex items-center cursor-pointer">
+                        <InputCheckbox
+                            @bind-Value="Model.RememberMe"
+                            class="mr-2 w-4 h-4 text-primary-500 border-neutral-300 rounded focus:ring-primary-500"
+                        />
+                        <span class="text-sm text-neutral-700">Remember me</span>
+                    </label>
+                    <a href="/forgot-password"
+                       class="text-sm text-primary-600 hover:text-primary-700 transition-colors">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <!-- Login Button -->
+                <button
+                    type="submit"
+                    class="w-full py-3 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed mb-6"
+                    disabled="@(string.IsNullOrWhiteSpace(LoadingMessage) is false)">
+                    @if (string.IsNullOrWhiteSpace(LoadingMessage) is false)
+                    {
+                        <span class="flex items-center justify-center gap-1">
+                            <span class="w-2 h-2 bg-white rounded-full motion-reduce:hidden animate-bounce"></span>
+                            <span class="w-2 h-2 bg-white rounded-full motion-reduce:hidden animate-bounce animate-delay-[0.2s]"></span>
+                            <span class="w-2 h-2 bg-white rounded-full motion-reduce:hidden animate-bounce animate-delay-[0.4s]"></span>
+                            @LoadingMessage
+                        </span>
+                    }
+                    else
+                    {
+                        <span>Log In</span>
+                    }
+                </button>
+
+                <!-- Divider -->
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-neutral-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-white text-neutral-500">Or continue with</span>
+                    </div>
+                </div>
+
+                <!-- Social Login Buttons (Visual Only) -->
+                <form method="post" action="/Account/Login/External" class="grid grid-cols-2 gap-3 mb-6">
+                    <AntiforgeryToken />
+                    <AsyncComponent Task="ExternalSchemes">
+                        <Waiting>
+                            <!-- Skeleton loaders for external auth buttons -->
+                            <div class="flex items-center justify-center px-4 py-2 border-2 border-neutral-200 rounded-lg bg-neutral-50 animate-pulse">
+                                <div class="w-5 h-5 bg-neutral-300 rounded mr-2"></div>
+                                <div class="h-4 w-16 bg-neutral-300 rounded"></div>
+                            </div>
+                        </Waiting>
+                        <Complete Context="result">
+                            @foreach (var scheme in result)
+                            {
+                                <button
+                                    type="submit"
+                                    name="provider"
+                                    value="@scheme.Name"
+                                    class="flex items-center justify-center px-4 py-2 border-2 border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                                    disabled="@(string.IsNullOrWhiteSpace(LoadingMessage) is false)">
+                                    <AuthProviderIcon Name="@scheme.Name"/>
+                                    @scheme.DisplayName
+                                </button>
+                            }
+                        </Complete>
+                        <Failed Context="exception">
+                            <span>Something went wrong!</span>
+                        </Failed>
+                    </AsyncComponent>
+                </form>
+
+                <!-- Register Link -->
+                <div class="text-center">
+                    <span class="text-neutral-600">Don't have an account? </span>
+                    <NavLink href="/Account/Register" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
+                        Sign up
+                    </NavLink>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm] private LoginModel Model { get; set; } = new();
+    [SupplyParameterFromQuery(Name = "error")] private string? ErrorMessage { get; set; }
+    private string? SuccessMessage { get; set; }
+    private string? LoadingMessage { get; set; }
+    private bool ShowPassword { get; set; }
+    private Task<IEnumerable<AuthenticationScheme>> ExternalSchemes { get; set; } = null!;
+
+    private void TogglePasswordVisibility() => ShowPassword = !ShowPassword;
+
+    private void StartExternalLogin(string provider)
+    {
+        LoadingMessage = $"Redirecting to {provider}";
+    }
+
+    protected override void OnInitialized()
+    {
+        ExternalSchemes = SignInManager.GetExternalAuthenticationSchemesAsync();
+    }
+
+    private async Task HandleLogin()
+    {
+        // Reset status messages
+        ErrorMessage = null;
+        SuccessMessage = null;
+        LoadingMessage = "Attempting to login…";
+        StateHasChanged();
+
+        var result = await SignInManager.PasswordSignInAsync(
+            Model.Email,
+            Model.Password,
+            isPersistent: Model.RememberMe,
+            lockoutOnFailure: false
+        );
+
+        // For now, show success for demo@example.com / password
+        if (result.Succeeded)
+        {
+            SuccessMessage = "Login succeeded, redirecting";
+            NavigationManager.NavigateTo("/");
+        }
+        else if (result.IsLockedOut)
+        {
+            ErrorMessage = "Your account is locked, contact an administrator";
+        }
+        else if (result.IsNotAllowed)
+        {
+            ErrorMessage = "Your account is now allowed to log in";
+        }
+        else if (result.RequiresTwoFactor)
+        {
+            ErrorMessage = "2 Factor authentication is required";
+        }
+        else
+        {
+            ErrorMessage = "Invalid username or password";
+        }
+
+        LoadingMessage = null;
+        StateHasChanged();
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required")]
+        [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
+        public string Password { get; set; } = string.Empty;
+
+        public bool RememberMe { get; set; }
+    }
+}

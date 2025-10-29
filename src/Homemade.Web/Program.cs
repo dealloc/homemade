@@ -1,4 +1,7 @@
+using Homemade.Database.Entities;
 using Homemade.Web.Components;
+using Homemade.Web.Controllers;
+using Homemade.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
@@ -23,6 +26,16 @@ builder.Services.AddGrpcClient<Homemade.AI.RecipeAI.RecipeAIClient>(o =>
     o.Address = new Uri("http://ai");
 }).AddServiceDiscovery();
 
+builder.AddDatabaseServices();
+builder.Services.AddIdentity<User, Role>();
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Credentials:Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Credentials:Google:ClientSecret"]!;
+    })
+    .AddGithub(builder.Configuration.GetSection("Credentials:Github"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -40,7 +53,12 @@ else
 app.UseHttpsRedirection();
 app.MapDefaultEndpoints();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
+
+app.MapPost("/Account/Login/External", ExternalLoginController.ExternalLogin);
+app.MapGet("/Account/Login/Callback", ExternalLoginController.ExternalLoginCallback);
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

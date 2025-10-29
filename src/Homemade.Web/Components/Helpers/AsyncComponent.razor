@@ -1,0 +1,29 @@
+﻿@typeparam T
+
+@if (Task.IsCompleted is false)
+{
+    @Waiting
+}
+else if (Task.IsFaulted)
+{
+    @Failed(Task.Exception)
+}
+else
+{
+    @Complete(Task.Result)
+}
+
+@code {
+    [Parameter, EditorRequired] public required Task<T> Task { get; set; }
+
+    [Parameter, EditorRequired] public RenderFragment Waiting { get; set; }
+
+    [Parameter, EditorRequired] public RenderFragment<T> Complete { get; set; }
+
+    [Parameter, EditorRequired] public RenderFragment<Exception> Failed { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Task.GetAwaiter().OnCompleted(() => InvokeAsync(StateHasChanged));
+    }
+}

@@ -13,7 +13,6 @@ public static class HostApplicationBuilderExtensions
     /// </summary>
     public static void AddMigrationWorker<TContext>(this IHostApplicationBuilder builder, string name) where TContext : DbContext
     {
-        builder.AddNpgsqlDbContext<TContext>(name);
         builder.Services.AddHostedService<MigrationsWorker<TContext>>();
     }
 }

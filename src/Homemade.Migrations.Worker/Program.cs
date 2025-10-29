@@ -5,6 +5,7 @@ builder.AddServiceDefaults();
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing.AddSource("MigrationsWorker"));
 
+builder.AddDatabaseServices();
 builder.AddMigrationWorker<HomemadeContext>("recipes");
 
 var host = builder.Build();
