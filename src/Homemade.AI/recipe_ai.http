@@ -1,0 +1,72 @@
+### Basic chat request with no history
+GRPC localhost:5000/recipe_ai.RecipeAI/Chat
+
+{
+  "message": "What is the best way to cook pasta?",
+  "context": "User is viewing a pasta recipe"
+}
+
+### Chat request with conversation history
+GRPC localhost:5000/recipe_ai.RecipeAI/Chat
+
+{
+  "message": "Can I use olive oil instead?",
+  "history": [
+    {
+      "role": "user",
+      "content": "What oil should I use for frying?",
+      "timestamp": 1704067200
+    },
+    {
+      "role": "assistant",
+      "content": "For frying, vegetable or canola oil works well due to their high smoke points.",
+      "timestamp": 1704067205
+    }
+  ],
+  "context": "Discussing cooking oils"
+}
+
+### Chat about ingredient substitutions
+GRPC localhost:5000/recipe_ai.RecipeAI/Chat
+
+{
+  "message": "What can I substitute for eggs in baking?",
+  "history": []
+}
+
+### Chat with recipe context
+GRPC localhost:5000/recipe_ai.RecipeAI/Chat
+
+{
+  "message": "How can I make this recipe healthier?",
+  "context": "Recipe: Chocolate Chip Cookies with 2 cups butter and 3 cups sugar"
+}
+
+### Multi-turn conversation
+GRPC localhost:5000/recipe_ai.RecipeAI/Chat
+
+{
+  "message": "That sounds great! How long should I bake them?",
+  "history": [
+    {
+      "role": "user",
+      "content": "I want to make chocolate chip cookies",
+      "timestamp": 1704067200
+    },
+    {
+      "role": "assistant",
+      "content": "Great! For chocolate chip cookies, you'll need flour, butter, sugar, eggs, vanilla, and chocolate chips. The key is to cream the butter and sugar well.",
+      "timestamp": 1704067210
+    },
+    {
+      "role": "user",
+      "content": "What temperature should I preheat the oven to?",
+      "timestamp": 1704067220
+    },
+    {
+      "role": "assistant",
+      "content": "Preheat your oven to 375°F (190°C). This temperature gives you nicely browned edges with soft centers.",
+      "timestamp": 1704067230
+    }
+  ]
+}

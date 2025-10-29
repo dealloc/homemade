@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+option csharp_namespace = "Homemade.AI";
+
+package recipe_ai;
+
+// The Recipe AI service definition.
+service RecipeAI {
+  // Imports a recipe from a URL and returns structured recipe data (non-streaming)
+  rpc ImportRecipeFromUrl (ImportRecipeRequest) returns (RecipeResponse);
+
+  // Searches for recipes online based on a query and returns matching results (non-streaming)
+  rpc SearchRecipes (SearchRecipesRequest) returns (SearchRecipesResponse);
+
+  // Parses raw recipe content (e.g., from a scraped webpage) into structured data (non-streaming)
+  rpc ParseRecipeContent (ParseRecipeRequest) returns (RecipeResponse);
+
+  // Regenerates a recipe with different AI settings or improved formatting (non-streaming)
+  rpc RegenerateRecipe (RegenerateRecipeRequest) returns (RecipeResponse);
+
+  // General conversational AI chat (streaming response)
+  rpc Chat (ChatRequest) returns (stream ChatResponse);
+}
+
+// Request to import a recipe from a URL
+message ImportRecipeRequest {
+  string url = 1;
+}
+
+// Request to search for recipes
+message SearchRecipesRequest {
+  string query = 1;
+  int32 max_results = 2;
+}
+
+// Response containing multiple recipe search results
+message SearchRecipesResponse {
+  repeated RecipeSearchResult results = 1;
+}
+
+// A single recipe search result
+message RecipeSearchResult {
+  string name = 1;
+  string icon = 2;
+  string source = 3;
+  string description = 4;
+  int32 total_time_minutes = 5;
+  int32 servings = 6;
+  string url = 7;
+}
+
+// Request to parse raw recipe content
+message ParseRecipeRequest {
+  string content = 1;
+  optional string source_url = 2;
+}
+
+// Request to regenerate a recipe
+message RegenerateRecipeRequest {
+  string existing_recipe_data = 1;
+  optional string instructions = 2; // Optional instructions for how to modify
+}
+
+// Response containing a complete recipe
+message RecipeResponse {
+  Recipe recipe = 1;
+  optional string original_source = 2;
+}
+
+// Complete recipe structure
+message Recipe {
+  string name = 1;
+  string icon = 2;
+  string description = 3;
+  int32 prep_time_minutes = 4;
+  int32 cook_time_minutes = 5;
+  int32 servings = 6;
+  RecipeDifficulty difficulty = 7;
+  repeated string ingredients = 8;
+  repeated string instructions = 9;
+  repeated string tags = 10;
+  optional string notes = 11;
+  optional NutritionInfo nutrition_info = 12;
+}
+
+// Recipe difficulty level
+enum RecipeDifficulty {
+  DIFFICULTY_UNSPECIFIED = 0;
+  DIFFICULTY_EASY = 1;
+  DIFFICULTY_MEDIUM = 2;
+  DIFFICULTY_HARD = 3;
+}
+
+// Nutrition information for a recipe
+message NutritionInfo {
+  string calories = 1;
+  string protein = 2;
+  string carbs = 3;
+  string fat = 4;
+}
+
+// Request for conversational AI chat
+message ChatRequest {
+  string message = 1;
+  repeated ChatMessage history = 2; // Previous conversation history
+  optional string context = 3; // Optional context (e.g., current recipe being viewed)
+}
+
+// A single chat message in the conversation
+message ChatMessage {
+  string role = 1; // "user" or "assistant"
+  string content = 2;
+  int64 timestamp = 3; // Unix timestamp
+}
+
+// Streaming response for chat
+message ChatResponse {
+  string content = 1; // Partial or complete message content
+  bool is_complete = 2; // True when the response is finished
+}
