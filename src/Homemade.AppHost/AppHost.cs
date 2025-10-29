@@ -23,12 +23,13 @@ builder.AddProject<Homemade_MCP>("mcp");
 
 // We manually inject the connection string to the Ollama service, otherwise it always appends the model name.
 // The reasoning is that we want to be able to swap the model without having to change the service name.
-builder.AddProject<Homemade_AI>("ai")
+var ai = builder.AddProject<Homemade_AI>("ai")
     .WithEnvironment("ConnectionStrings__ollama", ollama.Resource.ConnectionStringExpression)
     .WaitFor(ollama);
 
 builder.AddProject<Homemade_Web>("web-interface")
-    .WithReference(redis);
+    .WithReference(redis)
+    .WithReference(ai);
 
 builder.AddDockerComposeEnvironment("compose");
 builder.Build().Run();

@@ -17,6 +17,12 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration.GetConnectionString("redis")
 );
 
+// Configure gRPC client for Recipe AI service
+builder.Services.AddGrpcClient<Homemade.AI.RecipeAI.RecipeAIClient>(o =>
+{
+    o.Address = new Uri("http://ai");
+}).AddServiceDiscovery();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -14,10 +14,18 @@
         <ProjectReference Include="..\Homemade.Web.Client\Homemade.Web.Client.csproj"/>
         <PackageReference Include="Elixus.Tailwind" Version="1.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.10"/>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.64.0"/>
+        <PackageReference Include="Grpc.Net.Client" Version="2.64.0"/>
     </ItemGroup>
 
     <ItemGroup>
       <TailwindInput Include="Styles/app.css" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="..\Homemade.AI\Protos\recipe_ai.proto" GrpcServices="Client">
+        <Link>Protos/recipe_ai.proto</Link>
+      </Protobuf>
     </ItemGroup>
 
 </Project>
