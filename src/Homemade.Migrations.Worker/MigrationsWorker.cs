@@ -9,7 +9,8 @@ namespace Homemade.Migrations.Worker;
 /// </summary>
 public sealed class MigrationsWorker<TContext>(
     ILogger<MigrationsWorker<TContext>> logger,
-    IServiceProvider serviceProvider
+    IServiceProvider serviceProvider,
+    IHostApplicationLifetime applicationLifetime
 ) : BackgroundService where TContext : DbContext
 {
     private static readonly ActivitySource Source = new("MigrationsWorker");
@@ -25,6 +26,8 @@ public sealed class MigrationsWorker<TContext>(
         // ReSharper disable once ExplicitCallerInfoArgument
         using var activity = Source.StartActivity($"{name}.{nameof(ExecuteAsync)}");
         await RunMigrationAsync(context, cancellationToken);
+
+        applicationLifetime.StopApplication();
     }
 
     /// <summary>
